@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-vibrant-bg: #FFF8F3;
+  --color-vibrant-text: #2D2D2D;
+  --color-vibrant-primary: #FF5F2E;
+  --color-vibrant-dark: #332211;
+}
+
+body {
+  background-color: var(--color-vibrant-bg);
+  color: var(--color-vibrant-text);
+}
+

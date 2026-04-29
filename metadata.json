@@ -1,0 +1,8 @@
+{
+  "name": "Hate Cooking",
+  "description": "An app for people who hate cooking. Snap a picture of your fridge and get extremely lazy, foolproof recipes complete with AI generated final dish pictures and steps.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
