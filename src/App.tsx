@@ -209,7 +209,7 @@ export default function App() {
     setAppState('ANALYSING');
     setErrorMsg(null);
     try {
-      let promptText = "Analyze the ingredients in this fridge. Suggest 3 extremely simple, low-effort recipes using mainly these ingredients. The user HATES cooking, so make them foolproof and quick.";
+      let promptText = "Analyze the ingredients in this fridge. Suggest 3 extremely simple, low-effort recipes using mainly these ingredients. The user HATES cooking, so make them foolproof and quick. Start each recipe name with a relevant food emoji.";
       if (preferences.length > 0) {
         promptText += ` IMPORTANT: The recipes MUST adhere entirely to these dietary requirements or preferences: ${preferences.join(', ')}.`;
       }
@@ -401,14 +401,19 @@ export default function App() {
 
                 <div className="mb-10 w-full max-w-lg">
                   <h3 className="font-bold text-gray-400 mb-3 uppercase tracking-widest text-sm">Any demands?</h3>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    {['Vegetarian', 'Vegan', 'Gluten Free', 'High Protein', 'No Cook'].map(pref => (
+                    {[
+                      { name: 'Vegetarian', emoji: '🥗' },
+                      { name: 'Vegan', emoji: '🌱' },
+                      { name: 'Gluten Free', emoji: '🌾' },
+                      { name: 'High Protein', emoji: '💪' },
+                      { name: 'No Cook', emoji: '🧊' }
+                    ].map(pref => (
                       <button 
-                        key={pref} 
-                        onClick={() => togglePreference(pref)}
-                        className={`touch-manipulation select-none px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all duration-75 active:scale-95 ${preferences.includes(pref) ? 'bg-[#FF5F2E] text-white border-[#FF5F2E] shadow-md shadow-orange-200' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700 hover:shadow-sm hover:-translate-y-0.5'}`}
+                        key={pref.name} 
+                        onClick={() => togglePreference(pref.name)}
+                        className={`touch-manipulation select-none px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all duration-75 active:scale-95 ${preferences.includes(pref.name) ? 'bg-[#FF5F2E] text-white border-[#FF5F2E] shadow-md shadow-orange-200' : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700 hover:shadow-sm hover:-translate-y-0.5'}`}
                       >
-                        {pref}
+                        {pref.emoji} {pref.name}
                       </button>
                     ))}
                   </div>
@@ -518,7 +523,9 @@ export default function App() {
                       >
                         <div>
                           <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-extrabold text-[#2D2D2D] group-hover:text-[#FF5F2E] transition-colors">{r.name}</h3>
+                            <h3 className="text-xl font-extrabold text-[#2D2D2D] group-hover:text-[#FF5F2E] transition-colors">
+                              {idx === 0 ? '🍳' : idx === 1 ? '🍲' : '🍝'} {r.name}
+                            </h3>
                             <div className="flex items-center gap-1 text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
                               <Clock size={12} />
                               {r.timeInMinutes}m
