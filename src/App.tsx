@@ -422,6 +422,7 @@ export default function App() {
 
                 <div className="mb-10 w-full max-w-lg">
                   <h3 className="font-bold text-gray-400 mb-3 uppercase tracking-widest text-sm">Any demands?</h3>
+                  <div className="flex flex-wrap gap-3 justify-center">
                     {[
                       { name: 'Vegetarian', emoji: '🥗' },
                       { name: 'Vegan', emoji: '🌱' },
