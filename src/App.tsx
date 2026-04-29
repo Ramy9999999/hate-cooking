@@ -249,7 +249,24 @@ export default function App() {
       const data = JSON.parse(response.text || '{}');
       if (data.ingredients && data.recipes) {
         setIngredients(data.ingredients);
-        setRecipes(data.recipes);
+        
+        // Parallel image generation for suggestions
+        const recipesWithImages = await Promise.all(data.recipes.map(async (r: any) => {
+          try {
+            const imgRes = await ai.models.generateContent({
+              model: 'gemini-2.5-flash-image',
+              contents: { parts: [{ text: r.imagePrompt + " Food photography, centered, white background, high quality." }] },
+              config: { imageConfig: { aspectRatio: "1:1" } }
+            });
+            const imgData = imgRes.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
+            return { ...r, image: imgData ? `data:image/png;base64,${imgData}` : null };
+          } catch (e) {
+            console.error("Image gen failed for suggestion", e);
+            return { ...r, image: null };
+          }
+        }));
+
+        setRecipes(recipesWithImages);
         setAppState('SUGGESTIONS');
       } else {
         throw new Error("Failed to parse recipes.");
@@ -394,9 +411,13 @@ export default function App() {
                 exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col items-center justify-center flex-1 text-center mt-12 md:mt-24 px-4"
               >
-                <div className="mb-6">
-                   <h1 className="text-5xl md:text-7xl font-black leading-none text-[#FF5F2E] mb-6 tracking-tighter">TOO LAZY TO THINK?</h1>
-                   <p className="text-xl text-gray-500 mb-8 max-w-lg mx-auto font-medium">Snap a picture of your fridge. We'll tell you what to make with zero effort.</p>
+                <div className="mb-10 w-full max-w-2xl relative">
+                  <div className="absolute -inset-4 bg-orange-100/50 rounded-[3rem] -z-10 blur-2xl"></div>
+                  <img src="/images/hero.png" alt="Delicious Food" className="w-full h-64 md:h-80 object-cover rounded-[2.5rem] shadow-2xl border-4 border-white mb-8" />
+                  <div className="text-center">
+                    <h1 className="text-5xl md:text-7xl font-black leading-none text-[#FF5F2E] mb-6 tracking-tighter">TOO LAZY TO THINK? 🥱</h1>
+                    <p className="text-xl text-gray-500 mb-8 max-w-lg mx-auto font-medium">Snap a picture of your fridge. We'll tell you what to make with zero effort. 🍕</p>
+                  </div>
                 </div>
 
                 <div className="mb-10 w-full max-w-lg">
@@ -519,21 +540,28 @@ export default function App() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => selectRecipe(r)}
-                        className="bg-white rounded-[2rem] p-6 shadow-sm border border-orange-100 flex items-center justify-between group cursor-pointer hover:shadow-md hover:border-orange-200 transition-all"
+                        className="bg-white rounded-[2rem] p-4 shadow-sm border border-orange-100 flex items-center gap-6 group cursor-pointer hover:shadow-md hover:border-orange-200 transition-all"
                       >
-                        <div>
+                        <div className="w-24 h-24 md:w-32 md:h-32 bg-orange-50 rounded-2xl overflow-hidden shrink-0">
+                          {(r as any).image ? (
+                            <img src={(r as any).image} alt={r.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-3xl">🍲</div>
+                          )}
+                        </div>
+                        <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-xl font-extrabold text-[#2D2D2D] group-hover:text-[#FF5F2E] transition-colors">
-                              {idx === 0 ? '🍳' : idx === 1 ? '🍲' : '🍝'} {r.name}
+                              {r.name}
                             </h3>
                             <div className="flex items-center gap-1 text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
                               <Clock size={12} />
                               {r.timeInMinutes}m
                             </div>
                           </div>
-                          <p className="text-gray-500 font-medium leading-relaxed">{r.description}</p>
+                          <p className="text-gray-500 font-medium leading-relaxed line-clamp-2">{r.description}</p>
                         </div>
-                        <ArrowRight className="shrink-0 ml-4 text-gray-300 group-hover:text-[#FF5F2E] group-hover:translate-x-2 transition-all w-6 h-6" />
+                        <ArrowRight className="shrink-0 ml-auto text-gray-300 group-hover:text-[#FF5F2E] group-hover:translate-x-2 transition-all w-6 h-6" />
                       </motion.div>
                     ))}
                   </div>
