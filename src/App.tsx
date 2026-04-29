@@ -1,10 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, RefreshCw, ChefHat, Frown, ArrowRight, Loader2, MessageSquare, Send, Heart, X, BookOpen, Trash2, Clock, ImagePlus } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai/web";
 import { motion, AnimatePresence } from 'motion/react';
 
 // Initialize AI
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+if (!apiKey) {
+  console.warn("GEMINI_API_KEY is missing! Make sure it's set in Vercel environment variables.");
+}
+const ai = new GoogleGenAI({ apiKey: apiKey || "" });
 
 type Recipe = {
   name: string;
@@ -251,8 +255,9 @@ export default function App() {
         throw new Error("Failed to parse recipes.");
       }
     } catch (err: any) {
-      console.error(err);
-      setErrorMsg("Something went wrong analyzing that mess. Try another photo.");
+      console.error("Analysis Error:", err);
+      const msg = err.message || "Unknown error";
+      setErrorMsg(`Something went wrong: ${msg}. Check if your API key is valid.`);
       setAppState('START');
     }
   };
