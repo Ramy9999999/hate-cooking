@@ -174,7 +174,7 @@ export default function App() {
       }
 
       const res = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
+        model: "gemini-1.5-flash",
         config: { systemInstruction: contextStr },
         contents: contents,
       });
@@ -215,7 +215,7 @@ export default function App() {
       }
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-1.5-flash",
         contents: {
           parts: [
             { inlineData: { data: base64Data, mimeType } },
@@ -272,7 +272,7 @@ export default function App() {
     try {
       // 1. Fetch text steps
       const stepsPromise = ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-1.5-flash",
         contents: `Give me foolproof, extremely simple step-by-step instructions to cook "${recipe.name}" using mostly: ${ingredients.join(', ')}. The user HATES cooking, so write the steps in a direct, slightly sarcastic but helpful tone. Keep them very short.`,
         config: {
           responseMimeType: "application/json",
